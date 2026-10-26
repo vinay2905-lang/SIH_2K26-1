@@ -106,3 +106,16 @@ def test_photo_metadata_and_duplicate_hash():
     h = imagehash.hex_to_hash
     assert h(info_a["phash"]) - h(info_c["phash"]) <= 6
     assert h(info_a["phash"]) - h(info_b["phash"]) > 6
+
+
+def test_signature_check_inside_a_running_event_loop(seeded):
+    # Jobs run inline (sync mode) are called from async endpoints; pyHanko's sync API must still work there.
+    import asyncio
+
+    pdf = (seeded / "samples" / "INST-SIT" / "BUILDING_COMPLETION" / "Building_completion_certificate.pdf").read_bytes()
+
+    async def check():
+        return signatures.check_signature(pdf)
+
+    result = asyncio.run(check())
+    assert result["intact"] and result["trusted"] and not result["modified_after_signing"], result

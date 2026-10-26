@@ -1,6 +1,8 @@
 """Validate PDF digital signatures (PKI) against configured trust roots."""
+import asyncio
 import io
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from ..config import get_settings
@@ -24,11 +26,27 @@ def trust_roots() -> list:
     return roots
 
 
+def _validate(sig, vc):
+    from pyhanko.sign.validation import validate_pdf_signature
+
+    return validate_pdf_signature(sig, vc, skip_diff=False)
+
+
+def _validate_anywhere(sig, vc):
+    """pyHanko's synchronous API starts its own event loop, so it cannot run inside one (a job run inline by an
+    async endpoint); there it runs on a short-lived helper thread instead."""
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        return _validate(sig, vc)
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        return pool.submit(_validate, sig, vc).result()
+
+
 def check_signature(data: bytes) -> dict:
     """Return {present, valid, intact, trusted, modified_after_signing, signer, signed_at, summary}."""
     try:
         from pyhanko.pdf_utils.reader import PdfFileReader
-        from pyhanko.sign.validation import validate_pdf_signature
         from pyhanko_certvalidator import ValidationContext
 
         reader = PdfFileReader(io.BytesIO(data), strict=False)
@@ -40,7 +58,7 @@ def check_signature(data: bytes) -> dict:
     sig = sigs[0]
     try:
         vc = ValidationContext(trust_roots=trust_roots(), allow_fetching=False)
-        st = validate_pdf_signature(sig, vc, skip_diff=False)
+        st = _validate_anywhere(sig, vc)
     except Exception as exc:
         log.warning("signature validation error: %s", exc)
         return {"present": True, "valid": False, "intact": False, "trusted": False,

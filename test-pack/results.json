@@ -1,0 +1,394 @@
+{
+ "date": "2026-10-26",
+ "baseline": {
+  "risk": 0,
+  "status": "CLEAR",
+  "institution": [
+   [
+    "info",
+    "Structural stability certificate: needs manual confirmation"
+   ],
+   [
+    "info",
+    "Affidavit (undertaking): needs manual confirmation"
+   ]
+  ],
+  "official": [
+   [
+    "info",
+    "Structural stability certificate: needs manual confirmation"
+   ],
+   [
+    "info",
+    "Affidavit (undertaking): needs manual confirmation"
+   ]
+  ]
+ },
+ "results": [
+  {
+   "file": "01_FIRE_NOC__expired.pdf",
+   "slot": "FIRE_NOC",
+   "problem": "Validity ended on 31-03-2026.",
+   "http": 200,
+   "document": {
+    "status": "PROCESSED",
+    "read_as": "Fire NOC",
+    "text_source": "TEXT_LAYER",
+    "ocr_confidence": null,
+    "signature": null
+   },
+   "risk": 49,
+   "overall": "NEEDS_ACTION",
+   "findings": [
+    {
+     "severity": "critical",
+     "title": "Fire NOC lapsed before the application date",
+     "message": "The Fire NOC is valid till 31-03-2026, but the application is dated 26-10-2026.",
+     "rule_id": "FIRE-NOC-01",
+     "visible_to_institution": true
+    },
+    {
+     "severity": "high",
+     "title": "Fire NOC validity differs from the application form",
+     "message": "The form declares the Fire NOC valid till 31-03-2027; the certificate says 31-03-2026.",
+     "rule_id": "FIRE-NOC-02",
+     "visible_to_institution": true
+    },
+    {
+     "severity": "high",
+     "title": "Fire NOC does not match the issuer's record",
+     "message": "Differs from State fire NOC registry: valid till: issuer has 2027-03-31, document shows 2026-03-31.",
+     "rule_id": "VERIFY-01",
+     "visible_to_institution": true
+    }
+   ]
+  },
+  {
+   "file": "02_FIRE_NOC__date_hidden_under_white_box.pdf",
+   "slot": "FIRE_NOC",
+   "problem": "The real date (31-03-2026) is covered with a white box and 31-03-2027 is typed on top.",
+   "http": 200,
+   "document": {
+    "status": "PROCESSED",
+    "read_as": "Fire NOC",
+    "text_source": "TEXT_LAYER",
+    "ocr_confidence": null,
+    "signature": null
+   },
+   "risk": 22,
+   "overall": "NEEDS_REVIEW",
+   "findings": [
+    {
+     "severity": "high",
+     "title": "Fire NOC: Text covered by a white box and replaced",
+     "message": "The file still contains “31-03-2026” under a white box; the visible text there is “31-03-2027”.",
+     "rule_id": "FORENSIC-TEXT_COVERED",
+     "visible_to_institution": false
+    },
+    {
+     "severity": "warning",
+     "title": "Fire NOC: Saved with a document-editing tool",
+     "message": "File metadata names an editing tool (iLovePDF).",
+     "rule_id": "FORENSIC-EDITING_TOOL",
+     "visible_to_institution": false
+    },
+    {
+     "severity": "warning",
+     "title": "Fire NOC: File changed after it was issued",
+     "message": "Created 28-03-2025, saved again 09-04-2026 (377 days later).",
+     "rule_id": "FORENSIC-EDITED_LATER",
+     "visible_to_institution": false
+    }
+   ]
+  },
+  {
+   "file": "03_FIRE_NOC__fake_certificate_number.pdf",
+   "slot": "FIRE_NOC",
+   "problem": "The certificate number does not exist at the fire department.",
+   "http": 200,
+   "document": {
+    "status": "PROCESSED",
+    "read_as": "Fire NOC",
+    "text_source": "TEXT_LAYER",
+    "ocr_confidence": null,
+    "signature": null
+   },
+   "risk": 12,
+   "overall": "NEEDS_REVIEW",
+   "findings": [
+    {
+     "severity": "high",
+     "title": "Fire NOC does not match the issuer's record",
+     "message": "State fire NOC registry has no record for FNOC/2025/DEH/40417.",
+     "rule_id": "VERIFY-01",
+     "visible_to_institution": true
+    }
+   ]
+  },
+  {
+   "file": "04_FIRE_NOC__actually_a_land_deed.pdf",
+   "slot": "FIRE_NOC",
+   "problem": "A land deed uploaded in the Fire NOC slot.",
+   "http": 200,
+   "document": {
+    "status": "PROCESSED",
+    "read_as": "Land document (registered deed)",
+    "text_source": "TEXT_LAYER",
+    "ocr_confidence": null,
+    "signature": null
+   },
+   "risk": 5,
+   "overall": "MINOR_ISSUES",
+   "findings": [
+    {
+     "severity": "warning",
+     "title": "04_FIRE_NOC__actually_a_land_deed.pdf looks like a Land document (registered deed)",
+     "message": "Uploaded as Fire NOC, but the content reads like a Land document (registered deed).",
+     "rule_id": "QUALITY-01",
+     "visible_to_institution": true
+    },
+    {
+     "severity": "info",
+     "title": "Fire NOC: needs manual confirmation",
+     "message": "Reference number could not be read; confirm manually.",
+     "rule_id": "VERIFY-01",
+     "visible_to_institution": true
+    }
+   ]
+  },
+  {
+   "file": "05_BUILDING_COMPLETION__edited_after_signing.pdf",
+   "slot": "BUILDING_COMPLETION",
+   "problem": "Digitally signed, then the built-up area on it was changed (3,500 m2 added).",
+   "http": 200,
+   "document": {
+    "status": "PROCESSED",
+    "read_as": "Building completion certificate",
+    "text_source": "TEXT_LAYER",
+    "ocr_confidence": null,
+    "signature": "File was changed after it was signed"
+   },
+   "risk": 41,
+   "overall": "NEEDS_REVIEW",
+   "findings": [
+    {
+     "severity": "high",
+     "title": "Building completion certificate does not match the issuer's record",
+     "message": "File was changed after it was signed",
+     "rule_id": "VERIFY-01",
+     "visible_to_institution": true
+    },
+    {
+     "severity": "high",
+     "title": "Building completion certificate: Text covered by a white box and replaced",
+     "message": "The file still contains “22,600 m2” under a white box; the visible text there is “26,100 m2”.",
+     "rule_id": "FORENSIC-TEXT_COVERED",
+     "visible_to_institution": false
+    },
+    {
+     "severity": "high",
+     "title": "Building completion certificate: Signed document was changed after signing",
+     "message": "File was changed after it was signed",
+     "rule_id": "FORENSIC-SIGNATURE_BROKEN",
+     "visible_to_institution": false
+    },
+    {
+     "severity": "warning",
+     "title": "Built-up area differs from the completion certificate",
+     "message": "Form declares 22600 m²; the completion certificate shows 26100 m².",
+     "rule_id": "BCC-01",
+     "visible_to_institution": true
+    }
+   ]
+  },
+  {
+   "file": "06_BUILDING_COMPLETION__not_signed.pdf",
+   "slot": "BUILDING_COMPLETION",
+   "problem": "No digital signature.",
+   "http": 200,
+   "document": {
+    "status": "PROCESSED",
+    "read_as": "Building completion certificate",
+    "text_source": "TEXT_LAYER",
+    "ocr_confidence": null,
+    "signature": null
+   },
+   "risk": 0,
+   "overall": "CLEAR",
+   "findings": [
+    {
+     "severity": "info",
+     "title": "Building completion certificate: needs manual confirmation",
+     "message": "Not digitally signed and no online source; confirm with the issuing office.",
+     "rule_id": "VERIFY-01",
+     "visible_to_institution": true
+    }
+   ]
+  },
+  {
+   "file": "07_AFFILIATION_LETTER__lower_intake.pdf",
+   "slot": "AFFILIATION_LETTER",
+   "problem": "The university allows 90 seats in B.Tech CSE, but the application asks for 120.",
+   "http": 200,
+   "document": {
+    "status": "PROCESSED",
+    "read_as": "University affiliation letter",
+    "text_source": "TEXT_LAYER",
+    "ocr_confidence": null,
+    "signature": null
+   },
+   "risk": 24,
+   "overall": "NEEDS_REVIEW",
+   "findings": [
+    {
+     "severity": "high",
+     "title": "Requested intake exceeds the affiliation letter",
+     "message": "B.Tech Computer Science and Engineering: 120 requested, 90 in affiliation letter",
+     "rule_id": "INTAKE-03",
+     "visible_to_institution": true
+    },
+    {
+     "severity": "high",
+     "title": "University affiliation letter does not match the issuer's record",
+     "message": "Differs from Affiliating-university API: intake B.Tech Computer Science and Engineering: issuer has 120, document shows 90.",
+     "rule_id": "VERIFY-01",
+     "visible_to_institution": true
+    }
+   ]
+  },
+  {
+   "file": "08_TER_RECEIPT__unknown_transaction.pdf",
+   "slot": "TER_RECEIPT",
+   "problem": "The transaction ID is not in the payment gateway's records.",
+   "http": 200,
+   "document": {
+    "status": "PROCESSED",
+    "read_as": "TER payment receipt",
+    "text_source": "TEXT_LAYER",
+    "ocr_confidence": null,
+    "signature": null
+   },
+   "risk": 12,
+   "overall": "NEEDS_REVIEW",
+   "findings": [
+    {
+     "severity": "high",
+     "title": "TER payment receipt does not match the issuer's record",
+     "message": "Payment gateway has no record for TER-2026-00417.",
+     "rule_id": "VERIFY-01",
+     "visible_to_institution": true
+    }
+   ]
+  },
+  {
+   "file": "09_FACULTY_LIST__unknown_faculty.pdf",
+   "slot": "FACULTY_LIST",
+   "problem": "Three faculty IDs are not in AICTE's faculty registry.",
+   "http": 200,
+   "document": {
+    "status": "PROCESSED",
+    "read_as": "Faculty list",
+    "text_source": "TEXT_LAYER",
+    "ocr_confidence": null,
+    "signature": null
+   },
+   "risk": 12,
+   "overall": "NEEDS_REVIEW",
+   "findings": [
+    {
+     "severity": "high",
+     "title": "Faculty IDs not found in AICTE faculty records",
+     "message": "Not found in AICTE records: FID-980000; FID-980001; FID-980002",
+     "rule_id": "FAC-01",
+     "visible_to_institution": true
+    }
+   ]
+  },
+  {
+   "file": "10_AFFIDAVIT__scanned_copy.pdf",
+   "slot": "AFFIDAVIT",
+   "problem": "A skewed, blurry scan with no text layer, so it has to be read by OCR.",
+   "http": 200,
+   "document": {
+    "status": "PROCESSED",
+    "read_as": "Affidavit (undertaking)",
+    "text_source": "OCR",
+    "ocr_confidence": 0.55,
+    "signature": null
+   },
+   "risk": 5,
+   "overall": "MINOR_ISSUES",
+   "findings": [
+    {
+     "severity": "warning",
+     "title": "Affidavit (undertaking) is hard to read",
+     "message": "Text could be read with only 0.55 confidence from 10_AFFIDAVIT__scanned_copy.pdf. Upload a clearer scan (300 dpi).",
+     "rule_id": "QUALITY-01",
+     "visible_to_institution": true
+    }
+   ]
+  },
+  {
+   "file": "11_LAB_PHOTO__taken_far_from_campus.jpg",
+   "slot": "LAB_PHOTO",
+   "problem": "The photo's GPS location is about 37 km from the campus.",
+   "http": 200,
+   "document": {
+    "status": "PROCESSED",
+    "read_as": "Computer-lab photograph",
+    "text_source": "NONE",
+    "ocr_confidence": null,
+    "signature": null
+   },
+   "risk": 5,
+   "overall": "MINOR_ISSUES",
+   "findings": [
+    {
+     "severity": "warning",
+     "title": "Photo location is away from the campus",
+     "message": "Location tags far from the campus: 11_LAB_PHOTO__taken_far_from_campus.jpg (36.9 km away). Ask for fresh photos or a physical check.",
+     "rule_id": "PHOTO-01",
+     "visible_to_institution": true
+    }
+   ]
+  },
+  {
+   "file": "12_LAB_PHOTO__copied_from_another_college.jpg",
+   "slot": "LAB_PHOTO",
+   "problem": "A re-saved copy of Wainganga Polytechnic's lab photo.",
+   "http": 200,
+   "document": {
+    "status": "PROCESSED",
+    "read_as": "Computer-lab photograph",
+    "text_source": "NONE",
+    "ocr_confidence": null,
+    "signature": null
+   },
+   "risk": 12,
+   "overall": "NEEDS_REVIEW",
+   "findings": [
+    {
+     "severity": "high",
+     "title": "Computer-lab photograph matches a document from another institution",
+     "message": "12_LAB_PHOTO__copied_from_another_college.jpg matches a near-identical photo (difference 0 of 64) filed by Wainganga Polytechnic in APP-2026-00087.",
+     "rule_id": "FORENSIC-DUPLICATE",
+     "visible_to_institution": false
+    }
+   ]
+  },
+  {
+   "file": "13_ANY_SLOT__not_really_a_pdf.pdf",
+   "slot": "FIRE_NOC",
+   "problem": "A text file renamed to .pdf.",
+   "http": 415,
+   "rejected": "Only PDF, JPEG and PNG files are accepted"
+  },
+  {
+   "file": "14_LAB_PHOTO__pdf_instead_of_photo.pdf",
+   "slot": "LAB_PHOTO",
+   "problem": "A PDF uploaded in the photo slot.",
+   "http": 415,
+   "rejected": "Upload photographs as JPEG or PNG"
+  }
+ ]
+}

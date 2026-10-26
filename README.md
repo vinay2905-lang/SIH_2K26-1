@@ -153,6 +153,16 @@ All settings are environment variables with the prefix `PRAMAAN_` (see `backend/
 | `PRAMAAN_CORS_ORIGIN_REGEX` | none | Same, as a regular expression (e.g. Vercel preview URLs) |
 | `PRAMAAN_SHOW_DEMO_LOGINS` | `true` (`false` in docker-compose) | List the demo accounts on the sign-in page |
 
+## Test pack: documents to try as an institution
+
+[`test-pack/`](test-pack/README.md) contains synthetic documents to upload as the demo institution `sit.dehradun`:
+- four clean files that complete its draft application;
+- 14 problem files: an expired certificate, a date hidden under a white box, a fake certificate number, the wrong document in a slot, a copied photo, and others.
+
+Its README lists what PRAMAAN reported for each file. Those results come from uploading every file into a fresh copy of the demo data, not from hand-written expectations. To regenerate it, run `python -m app.seed.testpack ../test-pack` from `backend/`.
+
+The signed files in the pack are trusted by any installation whose demo data was loaded with this version of the code. On an older install, run `python -m app.seed` again first.
+
 ## Tests
 
 ```bash
