@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .. import audit
+from ..config import get_settings
 from ..db import get_db
 from ..models import Institution, User
 from ..pipeline.rules_engine import CATEGORIES, OPS, SEVERITIES
@@ -44,6 +45,8 @@ def me(user: User = Depends(current_user), db: Session = Depends(get_db)):
 @router.get("/auth/demo-users")
 def demo_users(db: Session = Depends(get_db)):
     """Synthetic demo accounts listed on the sign-in page (sandbox only)."""
+    if not get_settings().show_demo_logins:
+        return []
     users = db.execute(select(User).where(User.active.is_(True)).order_by(User.role, User.username)).scalars().all()
     out = []
     for u in users:

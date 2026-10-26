@@ -104,15 +104,23 @@ Every account uses the password **`Pramaan@2026`**. The login page also lists th
 | APP-2026-00087 | Wainganga Polytechnic, Nagpur | Clean application, already approved |
 | APP-2026-00301 | Shivalik Institute of Technology, Dehradun | Draft with only some documents uploaded. Log in as `sit.dehradun` and use **Use sample** to finish it. |
 
+## Hosting it on the web
+
+**[docs/DEPLOY.md](docs/DEPLOY.md)** gives step-by-step instructions for putting PRAMAAN online with HTTPS on a cloud VM, for example with Azure for Students' free credit. On the server it comes down to:
+
+```bash
+git clone -b claude/stoic-mayer-utvdia https://github.com/vinay2905-lang/SIH_2K26-1.git pramaan && cd pramaan
+sudo bash deploy/setup.sh --domain <your-hostname> --demo
+```
+
 ## Production deployment (Docker)
 
-`docker-compose.yml` runs PostgreSQL, the API (2 processes), a separate background worker, and nginx serving the React build.
+`docker-compose.yml` runs PostgreSQL, the API (2 processes), a separate background worker, and nginx serving the React build. With `COMPOSE_PROFILES=https` and `PRAMAAN_DOMAIN` set, it also runs Caddy, which serves the site over HTTPS with an automatic certificate. `deploy/setup.sh` writes all of this for you.
 
 ```bash
 cp .env.example .env        # then fill in POSTGRES_PASSWORD, PRAMAAN_STORAGE_KEY, PRAMAAN_JWT_SECRET
 docker compose up -d --build
-# optional: load the synthetic demo data (wipes everything; stop the worker while it runs)
-docker compose stop worker && docker compose run --rm api python -m app.seed --yes && docker compose start worker
+bash deploy/reset-demo.sh   # optional: load the synthetic demo data (wipes everything)
 ```
 
 Open http://localhost:8080.
@@ -138,6 +146,7 @@ All settings are environment variables with the prefix `PRAMAAN_` (see `backend/
 | `PRAMAAN_TESSERACT_CMD` | auto | Path to `tesseract`/`tesseract.exe` if it is not on PATH |
 | `PRAMAAN_CURRENT_CYCLE` | `2026-27` | Approval cycle whose rulebook is used |
 | `PRAMAAN_CORS_ORIGINS` | Vite dev origins | Comma-separated |
+| `PRAMAAN_SHOW_DEMO_LOGINS` | `true` (`false` in docker-compose) | List the demo accounts on the sign-in page |
 
 ## Tests
 
@@ -180,7 +189,8 @@ backend/
   tests/
 frontend/           React + TypeScript (Vite)
 e2e/                Playwright walkthrough
-docs/ARCHITECTURE.md
+deploy/             setup.sh (server install), reset-demo.sh, Caddyfile (HTTPS)
+docs/               ARCHITECTURE.md, DEPLOY.md
 docker-compose.yml
 ```
 

@@ -1,5 +1,6 @@
 // Browser walkthrough of the main flows for every role. Fails on any page error or console error.
 // Usage: node e2e/walkthrough.cjs [baseUrl] [screenshotDir]   (expects freshly seeded data)
+// Set E2E_IGNORE_HTTPS_ERRORS=1 to test an HTTPS site with a self-signed certificate.
 const { chromium } = require("playwright");
 const fs = require("fs");
 const path = require("path");
@@ -44,7 +45,10 @@ async function waitIdle(page, timeout = 90000) {
 
 (async () => {
   const browser = await chromium.launch();
-  const context = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
+  const context = await browser.newContext({
+    viewport: { width: 1600, height: 1000 },
+    ignoreHTTPSErrors: process.env.E2E_IGNORE_HTTPS_ERRORS === "1",
+  });
   const page = await context.newPage();
   page.on("pageerror", (e) => problems.push(`pageerror: ${e.message}`));
   page.on("console", (m) => { if (m.type() === "error") problems.push(`console: ${m.text()}`); });

@@ -42,6 +42,9 @@ class Settings(BaseSettings):
     # Path to tesseract(.exe) when it is not on PATH. On Windows the default install folder is found automatically.
     tesseract_cmd: str = ""
 
+    # List the demo accounts on the sign-in page. Turn this off for any real deployment.
+    show_demo_logins: bool = True
+
     # Rule/process defaults
     current_cycle: str = "2026-27"
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"

@@ -1,0 +1,9 @@
+# Caddy obtains and renews the HTTPS certificate for PRAMAAN_DOMAIN by itself.
+{$PRAMAAN_DOMAIN:localhost} {
+	encode gzip
+	request_body {
+		max_size 12MB
+	}
+	header Strict-Transport-Security "max-age=31536000"
+	reverse_proxy web:80
+}

@@ -241,3 +241,15 @@ def test_audit_chain_is_intact_then_detects_tampering(client, tokens):
 @pytest.mark.parametrize("path", ["/api/health", "/sandbox/health"])
 def test_health(client, path):
     assert client.get(path).status_code == 200
+
+
+def test_demo_logins_can_be_hidden(client):
+    from app.config import get_settings
+
+    assert any(u["username"] == "a.kulkarni" for u in client.get("/api/auth/demo-users").json())
+    settings = get_settings()
+    settings.show_demo_logins = False
+    try:
+        assert client.get("/api/auth/demo-users").json() == []
+    finally:
+        settings.show_demo_logins = True
