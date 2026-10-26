@@ -1,0 +1,69 @@
+# PRAMAAN: PostgreSQL + API + background worker + web (nginx serving the React build).
+#   cp .env.example .env   # then set your own secrets
+#   docker compose up -d --build
+#   docker compose run --rm api python -m app.seed   # optional: load the synthetic demo data
+# Open http://localhost:8080
+
+x-backend: &backend
+  build: ./backend
+  restart: unless-stopped
+  depends_on:
+    db:
+      condition: service_healthy
+  volumes:
+    - pramaan-data:/data
+  environment:
+    PRAMAAN_ENV: production
+    PRAMAAN_DATABASE_URL: postgresql+psycopg://pramaan:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/pramaan
+    PRAMAAN_STORAGE_KEY: ${PRAMAAN_STORAGE_KEY:?set PRAMAAN_STORAGE_KEY in .env}
+    PRAMAAN_JWT_SECRET: ${PRAMAAN_JWT_SECRET:?set PRAMAAN_JWT_SECRET in .env}
+    PRAMAAN_JOB_MODE: worker
+    PRAMAAN_ISSUER_BASE_URL: http://api:8000/sandbox
+    PRAMAAN_CORS_ORIGINS: ${PRAMAAN_CORS_ORIGINS:-http://localhost:8080}
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pramaan
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: pramaan
+      POSTGRES_INITDB_ARGS: --encoding=UTF8
+    volumes:
+      - pramaan-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pramaan -d pramaan"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    <<: *backend
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  worker:
+    <<: *backend
+    command: ["python", "-m", "app.worker"]
+    depends_on:
+      db:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${PRAMAAN_HTTP_PORT:-8080}:80"
+
+volumes:
+  pramaan-db:
+  pramaan-data:

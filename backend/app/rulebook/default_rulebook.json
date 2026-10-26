@@ -1,0 +1,728 @@
+{
+  "cycle": "2026-27",
+  "settings": {
+    "expiry_warning_days": 60,
+    "min_lab_photos": 2,
+    "photo_max_distance_km": 2.0,
+    "photo_window_days": 365
+  },
+  "checklists": {
+    "EOA": [
+      {
+        "doc_type": "LAND_DEED",
+        "required": true
+      },
+      {
+        "doc_type": "BUILDING_COMPLETION",
+        "required": true
+      },
+      {
+        "doc_type": "FIRE_NOC",
+        "required": true
+      },
+      {
+        "doc_type": "STRUCTURAL_STABILITY",
+        "required": true
+      },
+      {
+        "doc_type": "AFFILIATION_LETTER",
+        "required": true
+      },
+      {
+        "doc_type": "NBA_ACCREDITATION",
+        "required": false
+      },
+      {
+        "doc_type": "TER_RECEIPT",
+        "required": true
+      },
+      {
+        "doc_type": "AFFIDAVIT",
+        "required": true
+      },
+      {
+        "doc_type": "FACULTY_LIST",
+        "required": true
+      },
+      {
+        "doc_type": "LAB_PHOTO",
+        "required": true,
+        "min_count": 2
+      }
+    ],
+    "INTAKE_INCREASE": [
+      {
+        "doc_type": "LAND_DEED",
+        "required": true
+      },
+      {
+        "doc_type": "BUILDING_COMPLETION",
+        "required": true
+      },
+      {
+        "doc_type": "FIRE_NOC",
+        "required": true
+      },
+      {
+        "doc_type": "STRUCTURAL_STABILITY",
+        "required": true
+      },
+      {
+        "doc_type": "AFFILIATION_LETTER",
+        "required": true
+      },
+      {
+        "doc_type": "NBA_ACCREDITATION",
+        "required": false
+      },
+      {
+        "doc_type": "TER_RECEIPT",
+        "required": true
+      },
+      {
+        "doc_type": "AFFIDAVIT",
+        "required": true
+      },
+      {
+        "doc_type": "FACULTY_LIST",
+        "required": true
+      },
+      {
+        "doc_type": "LAB_PHOTO",
+        "required": true,
+        "min_count": 2
+      }
+    ],
+    "NEW_PROGRAMME": [
+      {
+        "doc_type": "LAND_DEED",
+        "required": true
+      },
+      {
+        "doc_type": "BUILDING_COMPLETION",
+        "required": true
+      },
+      {
+        "doc_type": "FIRE_NOC",
+        "required": true
+      },
+      {
+        "doc_type": "AFFILIATION_LETTER",
+        "required": true
+      },
+      {
+        "doc_type": "TER_RECEIPT",
+        "required": true
+      },
+      {
+        "doc_type": "AFFIDAVIT",
+        "required": true
+      },
+      {
+        "doc_type": "FACULTY_LIST",
+        "required": true
+      },
+      {
+        "doc_type": "LAB_PHOTO",
+        "required": true,
+        "min_count": 2
+      }
+    ]
+  },
+  "rules": [
+    {
+      "rule_id": "FIRE-NOC-01",
+      "title": "Fire NOC valid on the date of submission",
+      "group": "Statutory and safety",
+      "source": "APH 2026-27 · fire and life safety requirements",
+      "scope": "application",
+      "applies_to": {
+        "app_types": [],
+        "states": []
+      },
+      "enabled": true,
+      "rows": [
+        {
+          "when": [
+            {
+              "fact": "doc.FIRE_NOC.valid_till",
+              "op": "before",
+              "ref": "application.as_of_date"
+            }
+          ],
+          "severity": "critical",
+          "category": "EXPIRED_DOCUMENT",
+          "doc_type": "FIRE_NOC",
+          "title": "Fire NOC lapsed before the application date",
+          "message": "The Fire NOC is valid till {doc.FIRE_NOC.valid_till}, but the application is dated {application.as_of_date}.",
+          "evidence": [
+            "doc.FIRE_NOC.valid_till",
+            "application.as_of_date"
+          ]
+        },
+        {
+          "when": [
+            {
+              "fact": "doc.FIRE_NOC.valid_till",
+              "op": "within_days",
+              "ref": "application.as_of_date",
+              "days": 60
+            }
+          ],
+          "severity": "warning",
+          "category": "EXPIRED_DOCUMENT",
+          "doc_type": "FIRE_NOC",
+          "title": "Fire NOC expires within 60 days",
+          "message": "The Fire NOC is valid only till {doc.FIRE_NOC.valid_till}. A renewed NOC will be needed soon.",
+          "evidence": [
+            "doc.FIRE_NOC.valid_till"
+          ]
+        }
+      ]
+    },
+    {
+      "rule_id": "FIRE-NOC-02",
+      "title": "Fire NOC details match the application",
+      "group": "Statutory and safety",
+      "source": "APH 2026-27 · fire and life safety requirements",
+      "scope": "application",
+      "applies_to": {
+        "app_types": [],
+        "states": []
+      },
+      "enabled": true,
+      "rows": [
+        {
+          "when": [
+            {
+              "fact": "doc.FIRE_NOC.valid_till",
+              "op": "differs",
+              "ref": "form.fire_noc_valid_till"
+            }
+          ],
+          "severity": "high",
+          "category": "INCONSISTENCY",
+          "doc_type": "FIRE_NOC",
+          "title": "Fire NOC validity differs from the application form",
+          "message": "The form declares the Fire NOC valid till {form.fire_noc_valid_till}; the certificate says {doc.FIRE_NOC.valid_till}.",
+          "evidence": [
+            "doc.FIRE_NOC.valid_till",
+            "form.fire_noc_valid_till"
+          ]
+        },
+        {
+          "when": [
+            {
+              "fact": "doc.FIRE_NOC.premises_name",
+              "op": "similar_lt",
+              "ref": "institution.name",
+              "value": 0.85
+            }
+          ],
+          "severity": "high",
+          "category": "INCONSISTENCY",
+          "doc_type": "FIRE_NOC",
+          "title": "Premises name on Fire NOC differs from AICTE record",
+          "message": "The NOC is issued to “{doc.FIRE_NOC.premises_name}”; AICTE records name the institution “{institution.name}”.",
+          "evidence": [
+            "doc.FIRE_NOC.premises_name",
+            "institution.name"
+          ]
+        }
+      ]
+    },
+    {
+      "rule_id": "STRUCT-01",
+      "title": "Structural stability certificate valid",
+      "group": "Statutory and safety",
+      "source": "APH 2026-27 · building and safety requirements",
+      "scope": "application",
+      "applies_to": {
+        "app_types": [],
+        "states": []
+      },
+      "enabled": true,
+      "rows": [
+        {
+          "when": [
+            {
+              "fact": "doc.STRUCTURAL_STABILITY.valid_till",
+              "op": "before",
+              "ref": "application.as_of_date"
+            }
+          ],
+          "severity": "critical",
+          "category": "EXPIRED_DOCUMENT",
+          "doc_type": "STRUCTURAL_STABILITY",
+          "title": "Structural stability certificate has lapsed",
+          "message": "Valid till {doc.STRUCTURAL_STABILITY.valid_till}; application dated {application.as_of_date}.",
+          "evidence": [
+            "doc.STRUCTURAL_STABILITY.valid_till",
+            "application.as_of_date"
+          ]
+        }
+      ]
+    },
+    {
+      "rule_id": "BCC-01",
+      "title": "Built-up area matches the building completion certificate",
+      "group": "Statutory and safety",
+      "source": "APH 2026-27 · land and building requirements",
+      "scope": "application",
+      "applies_to": {
+        "app_types": [],
+        "states": []
+      },
+      "enabled": true,
+      "rows": [
+        {
+          "when": [
+            {
+              "fact": "doc.BUILDING_COMPLETION.built_up_area",
+              "op": "differs",
+              "ref": "form.built_up_area_m2"
+            }
+          ],
+          "severity": "warning",
+          "category": "INCONSISTENCY",
+          "doc_type": "BUILDING_COMPLETION",
+          "title": "Built-up area differs from the completion certificate",
+          "message": "Form declares {form.built_up_area_m2} m²; the completion certificate shows {doc.BUILDING_COMPLETION.built_up_area} m².",
+          "evidence": [
+            "doc.BUILDING_COMPLETION.built_up_area",
+            "form.built_up_area_m2"
+          ]
+        }
+      ]
+    },
+    {
+      "rule_id": "AFF-01",
+      "title": "Affiliation letter is for this cycle",
+      "group": "Academic",
+      "source": "APH 2026-27 · affiliation requirements",
+      "scope": "application",
+      "applies_to": {
+        "app_types": [],
+        "states": []
+      },
+      "enabled": true,
+      "rows": [
+        {
+          "when": [
+            {
+              "fact": "doc.AFFILIATION_LETTER.academic_year",
+              "op": "differs",
+              "ref": "application.cycle"
+            }
+          ],
+          "severity": "high",
+          "category": "INCONSISTENCY",
+          "doc_type": "AFFILIATION_LETTER",
+          "title": "Affiliation letter is for a different academic year",
+          "message": "The letter covers {doc.AFFILIATION_LETTER.academic_year}; this application is for {application.cycle}.",
+          "evidence": [
+            "doc.AFFILIATION_LETTER.academic_year",
+            "application.cycle"
+          ]
+        }
+      ]
+    },
+    {
+      "rule_id": "INTAKE-03",
+      "title": "Requested intake within affiliation",
+      "group": "Academic",
+      "source": "APH 2026-27 · intake and affiliation",
+      "scope": "application",
+      "applies_to": {
+        "app_types": [],
+        "states": []
+      },
+      "enabled": true,
+      "rows": [
+        {
+          "when": [
+            {
+              "fact": "derived.intake_over_affiliation",
+              "op": "not_empty"
+            }
+          ],
+          "severity": "high",
+          "category": "INCONSISTENCY",
+          "doc_type": "AFFILIATION_LETTER",
+          "title": "Requested intake exceeds the affiliation letter",
+          "message": "{derived.intake_over_affiliation}",
+          "evidence": [
+            "derived.intake_over_affiliation"
+          ]
+        },
+        {
+          "when": [
+            {
+              "fact": "derived.programmes_missing_in_affiliation",
+              "op": "not_empty"
+            }
+          ],
+          "severity": "high",
+          "category": "INCONSISTENCY",
+          "doc_type": "AFFILIATION_LETTER",
+          "title": "Programme not listed in the affiliation letter",
+          "message": "Not in the affiliation letter: {derived.programmes_missing_in_affiliation}",
+          "evidence": [
+            "derived.programmes_missing_in_affiliation"
+          ]
+        }
+      ]
+    },
+    {
+      "rule_id": "INTAKE-04",
+      "title": "Extension of Approval keeps the approved intake",
+      "group": "Academic",
+      "source": "APH 2026-27 · extension of approval",
+      "scope": "application",
+      "applies_to": {
+        "app_types": [
+          "EOA"
+        ],
+        "states": []
+      },
+      "enabled": true,
+      "rows": [
+        {
+          "when": [
+            {
+              "fact": "derived.intake_over_records",
+              "op": "not_empty"
+            }
+          ],
+          "severity": "high",
+          "category": "INCONSISTENCY",
+          "title": "Intake above the last AICTE approval",
+          "message": "Extension of Approval cannot raise intake. Above last approval: {derived.intake_over_records}",
+          "evidence": [
+            "derived.intake_over_records"
+          ]
+        }
+      ]
+    },
+    {
+      "rule_id": "NBA-02",
+      "title": "Accreditation validity",
+      "group": "Academic",
+      "source": "APH 2026-27 · accreditation",
+      "scope": "application",
+      "applies_to": {
+        "app_types": [],
+        "states": []
+      },
+      "enabled": true,
+      "rows": [
+        {
+          "when": [
+            {
+              "fact": "doc.NBA_ACCREDITATION.valid_till",
+              "op": "before",
+              "ref": "application.as_of_date"
+            }
+          ],
+          "severity": "warning",
+          "category": "EXPIRED_DOCUMENT",
+          "doc_type": "NBA_ACCREDITATION",
+          "title": "NBA accreditation has lapsed",
+          "message": "Accreditation valid till {doc.NBA_ACCREDITATION.valid_till}.",
+          "evidence": [
+            "doc.NBA_ACCREDITATION.valid_till"
+          ]
+        }
+      ]
+    },
+    {
+      "rule_id": "FAC-01",
+      "title": "Faculty list matches AICTE faculty records",
+      "group": "Faculty",
+      "source": "APH 2026-27 · faculty requirements",
+      "scope": "application",
+      "applies_to": {
+        "app_types": [],
+        "states": []
+      },
+      "enabled": true,
+      "rows": [
+        {
+          "when": [
+            {
+              "fact": "derived.faculty_not_in_records",
+              "op": "not_empty"
+            }
+          ],
+          "severity": "high",
+          "category": "INCONSISTENCY",
+          "doc_type": "FACULTY_LIST",
+          "title": "Faculty IDs not found in AICTE faculty records",
+          "message": "Not found in AICTE records: {derived.faculty_not_in_records}",
+          "evidence": [
+            "derived.faculty_not_in_records"
+          ]
+        }
+      ]
+    },
+    {
+      "rule_id": "FAC-RATIO-01",
+      "title": "Student–faculty ratio",
+      "group": "Faculty",
+      "source": "APH 2026-27 · faculty norms (set the ratio from the current handbook)",
+      "scope": "application",
+      "applies_to": {
+        "app_types": [],
+        "states": []
+      },
+      "enabled": true,
+      "rows": [
+        {
+          "when": [
+            {
+              "fact": "derived.student_faculty_ratio",
+              "op": "gt",
+              "value": 20
+            }
+          ],
+          "severity": "high",
+          "category": "COMPLIANCE_GAP",
+          "doc_type": "FACULTY_LIST",
+          "title": "Student–faculty ratio above the norm",
+          "message": "About {derived.student_estimate} students for {derived.faculty_count} faculty gives 1:{derived.student_faculty_ratio}; the norm used is 1:20.",
+          "evidence": [
+            "derived.student_faculty_ratio",
+            "derived.faculty_count"
+          ]
+        }
+      ]
+    },
+    {
+      "rule_id": "LAB-COMP-02",
+      "title": "Computer lab capacity",
+      "group": "Infrastructure",
+      "source": "APH 2026-27 · infrastructure norms (set the ratio from the current handbook)",
+      "scope": "application",
+      "applies_to": {
+        "app_types": [],
+        "states": []
+      },
+      "enabled": true,
+      "rows": [
+        {
+          "when": [
+            {
+              "fact": "form.computer_count",
+              "op": "lt",
+              "ref": "derived.required_computers"
+            }
+          ],
+          "severity": "high",
+          "category": "COMPLIANCE_GAP",
+          "title": "Fewer computers than the norm",
+          "message": "{form.computer_count} computers declared; about {derived.required_computers} needed for the requested intake (1 per 2 students of first-year intake).",
+          "evidence": [
+            "form.computer_count",
+            "derived.required_computers"
+          ]
+        }
+      ]
+    },
+    {
+      "rule_id": "PHOTO-01",
+      "title": "Infrastructure photographs are recent and from the campus",
+      "group": "Infrastructure",
+      "source": "APH 2026-27 · infrastructure evidence",
+      "scope": "application",
+      "applies_to": {
+        "app_types": [],
+        "states": []
+      },
+      "enabled": true,
+      "rows": [
+        {
+          "when": [
+            {
+              "fact": "derived.photos_far_from_campus",
+              "op": "not_empty"
+            }
+          ],
+          "severity": "warning",
+          "category": "COMPLIANCE_GAP",
+          "doc_type": "LAB_PHOTO",
+          "title": "Photo location is away from the campus",
+          "message": "Location tags far from the campus: {derived.photos_far_from_campus}. Ask for fresh photos or a physical check.",
+          "evidence": [
+            "derived.photos_far_from_campus"
+          ]
+        },
+        {
+          "when": [
+            {
+              "fact": "derived.photos_without_location",
+              "op": "not_empty"
+            }
+          ],
+          "severity": "info",
+          "category": "COMPLIANCE_GAP",
+          "doc_type": "LAB_PHOTO",
+          "title": "Photos without a location tag",
+          "message": "No GPS tag in: {derived.photos_without_location}.",
+          "evidence": [
+            "derived.photos_without_location"
+          ]
+        },
+        {
+          "when": [
+            {
+              "fact": "derived.photos_outside_window",
+              "op": "not_empty"
+            }
+          ],
+          "severity": "warning",
+          "category": "COMPLIANCE_GAP",
+          "doc_type": "LAB_PHOTO",
+          "title": "Photos taken more than a year ago",
+          "message": "Old photos: {derived.photos_outside_window}.",
+          "evidence": [
+            "derived.photos_outside_window"
+          ]
+        }
+      ]
+    },
+    {
+      "rule_id": "VERIFY-01",
+      "title": "Document matches the issuing authority's record",
+      "group": "Verification",
+      "source": "Issuer verification policy",
+      "scope": "each_document",
+      "applies_to": {
+        "app_types": [],
+        "states": []
+      },
+      "enabled": true,
+      "rows": [
+        {
+          "when": [
+            {
+              "fact": "this.verify_status",
+              "op": "eq",
+              "value": "MISMATCH"
+            },
+            {
+              "fact": "this.verify_external",
+              "op": "exists"
+            }
+          ],
+          "severity": "high",
+          "category": "VERIFICATION",
+          "title": "{this.label} does not match the issuer's record",
+          "message": "{this.verify_note}",
+          "evidence": [
+            "this.verify_status"
+          ]
+        },
+        {
+          "when": [
+            {
+              "fact": "this.verify_status",
+              "op": "eq",
+              "value": "SOURCE_UNAVAILABLE"
+            },
+            {
+              "fact": "this.verify_external",
+              "op": "exists"
+            }
+          ],
+          "severity": "info",
+          "category": "VERIFICATION",
+          "title": "{this.label}: issuer source unavailable, confirm manually",
+          "message": "{this.verify_note}",
+          "evidence": [
+            "this.verify_status"
+          ]
+        },
+        {
+          "when": [
+            {
+              "fact": "this.verify_status",
+              "op": "eq",
+              "value": "MANUAL_REVIEW"
+            },
+            {
+              "fact": "this.verify_external",
+              "op": "exists"
+            }
+          ],
+          "severity": "info",
+          "category": "VERIFICATION",
+          "title": "{this.label}: needs manual confirmation",
+          "message": "{this.verify_note}",
+          "evidence": [
+            "this.verify_status"
+          ]
+        }
+      ]
+    },
+    {
+      "rule_id": "QUALITY-01",
+      "title": "Documents are readable and filed in the right place",
+      "group": "Document quality",
+      "source": "Submission guidelines",
+      "scope": "each_document",
+      "applies_to": {
+        "app_types": [],
+        "states": []
+      },
+      "enabled": true,
+      "rows": [
+        {
+          "when": [
+            {
+              "fact": "this.ocr_confidence",
+              "op": "lt",
+              "value": 0.6
+            }
+          ],
+          "severity": "warning",
+          "category": "QUALITY",
+          "title": "{this.label} is hard to read",
+          "message": "Text could be read with only {this.ocr_confidence} confidence from {this.filename}. Upload a clearer scan (300 dpi).",
+          "evidence": [
+            "this.ocr_confidence"
+          ]
+        },
+        {
+          "when": [
+            {
+              "fact": "this.misfiled_as",
+              "op": "exists"
+            }
+          ],
+          "severity": "warning",
+          "category": "QUALITY",
+          "title": "{this.filename} looks like a {this.misfiled_as}",
+          "message": "Uploaded as {this.label}, but the content reads like a {this.misfiled_as}.",
+          "evidence": [
+            "this.misfiled_as"
+          ]
+        },
+        {
+          "when": [
+            {
+              "fact": "this.unreadable",
+              "op": "exists"
+            }
+          ],
+          "severity": "warning",
+          "category": "QUALITY",
+          "title": "{this.label} could not be read",
+          "message": "{this.unreadable}",
+          "evidence": [
+            "this.unreadable"
+          ]
+        }
+      ]
+    }
+  ]
+}

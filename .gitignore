@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+backend/data/
+
+# Node
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Local config and secrets
+.env
+
+# e2e output
+e2e/screenshots/
+e2e/node_modules/
+
+.DS_Store
