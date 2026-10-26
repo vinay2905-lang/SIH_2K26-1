@@ -15,7 +15,7 @@ from ..db import get_db
 from ..models import Alert, Application, AuditEvent, PrecheckRun, User, Verification
 from ..security import OFFICIALS, current_user, require_roles
 from .applications import current_findings, finding_counts
-from .serializers import alert_json, app_summary, audit_json, aware, verification_json
+from .serializers import alert_json, app_summary, audit_json, aware, iso, verification_json
 
 router = APIRouter(prefix="/api", tags=["insights"])
 
@@ -126,7 +126,7 @@ def audit_export(application_id: str | None = None, user: User = Depends(require
     w.writerow(["id", "time_utc", "actor", "actor_type", "action", "object_type", "object_id", "application_id",
                 "details", "prev_hash", "hash"])
     for e in db.execute(query).scalars():
-        w.writerow([e.id, e.ts.isoformat(), e.actor, e.actor_type, e.action, e.object_type, e.object_id,
+        w.writerow([e.id, iso(e.ts), e.actor, e.actor_type, e.action, e.object_type, e.object_id,
                     e.application_id or "", e.details, e.prev_hash, e.hash])
     audit.record("Audit exported", "audit", application_id or "all", user=user)
     return Response(buf.getvalue(), media_type="text/csv",

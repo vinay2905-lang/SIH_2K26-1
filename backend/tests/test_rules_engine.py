@@ -46,7 +46,7 @@ def test_validate_rulebook_reports_problems():
 
 
 def test_default_rulebook_is_valid():
-    content = json.loads((Path(__file__).resolve().parents[1] / "app/rulebook/default_rulebook.json").read_text())
+    content = json.loads((Path(__file__).resolve().parents[1] / "app/rulebook/default_rulebook.json").read_text(encoding="utf-8"))
     assert re_.validate_rulebook(content) == []
 
 

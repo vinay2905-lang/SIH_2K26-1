@@ -34,7 +34,7 @@ def test_concurrent_startup_on_empty_database():
     env = {**os.environ, "PRAMAAN_DATABASE_URL": url, "PRAMAAN_DATA_DIR": str(data_dir)}
     try:
         procs = [subprocess.Popen([sys.executable, "-c", STARTUP], cwd=BACKEND, env=env,
-                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) for _ in range(6)]
+                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8", errors="replace") for _ in range(6)]
         results = [(p.wait(timeout=120), p.stderr.read()) for p in procs]
         for code, err in results:
             assert code == 0, err[-1500:]

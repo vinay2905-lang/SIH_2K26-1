@@ -34,7 +34,7 @@ def mask_pii(text: str) -> str:
 
 
 def default_rulebook() -> dict:
-    return json.loads(DEFAULT_RULEBOOK.read_text())
+    return json.loads(DEFAULT_RULEBOOK.read_text(encoding="utf-8"))
 
 
 def published_rulebook(db, cycle: str) -> RulebookVersion:

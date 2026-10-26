@@ -22,7 +22,43 @@ It is **decision support only**. The system never approves or rejects anything. 
 
 ## Quick start (local development)
 
-Requirements: Python 3.11+, Node 20+, and Tesseract with Hindi language data (`apt install tesseract-ocr tesseract-ocr-hin`). Without Tesseract, everything still works except OCR of scanned pages.
+Requirements: Python 3.11+ (from python.org), Node 20+, Git, and optionally Tesseract with Hindi language data. Without Tesseract, everything works except OCR of scanned pages: those are sent to manual review instead.
+
+Get the code first. The application is on the `claude/stoic-mayer-utvdia` branch:
+
+```bash
+git clone -b claude/stoic-mayer-utvdia https://github.com/vinay2905-lang/sih_2k26-1.git
+cd sih_2k26-1
+```
+
+### Windows (Command Prompt)
+
+```bat
+:: Backend: first window, from the sih_2k26-1 folder
+cd backend
+py -3.13 -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements-dev.txt
+python -m app.seed
+uvicorn app.main:app
+
+:: Frontend: second window, from the sih_2k26-1 folder
+cd frontend
+npm ci
+npm run dev
+```
+
+Open http://localhost:5173.
+
+- If `py` is not found, create the virtual environment with the full path to python.org's Python instead, e.g. `"%LOCALAPPDATA%\Programs\Python\Python313\python.exe" -m venv .venv`.
+- Don't use the MSYS2/MinGW Python (`C:\msys64\...`): PyMuPDF, OpenCV and NumPy have no packages for it.
+- After `activate`, the prompt starts with `(.venv)`. Run `.venv\Scripts\activate` again in every new window you use for the backend.
+- In PowerShell, activate with `.venv\Scripts\Activate.ps1`. If scripts are blocked, first run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
+- To install Tesseract, use the installer from https://github.com/UB-Mannheim/tesseract/wiki and tick **Hindi** under "Additional language data". PRAMAAN finds `C:\Program Files\Tesseract-OCR` by itself. For another folder, set `PRAMAAN_TESSERACT_CMD` to the path of `tesseract.exe`.
+
+### Linux / macOS
+
+Tesseract: `apt install tesseract-ocr tesseract-ocr-hin` or `brew install tesseract tesseract-lang`.
 
 ```bash
 # Backend
@@ -98,7 +134,8 @@ All settings are environment variables with the prefix `PRAMAAN_` (see `backend/
 | `PRAMAAN_ISSUER_BASE_URL` | `http://127.0.0.1:8000/sandbox` | Base URL of the issuer verification APIs |
 | `PRAMAAN_MOUNT_SANDBOX` | `true` | Serve the mock issuer APIs at `/sandbox` |
 | `PRAMAAN_MAX_UPLOAD_MB` | `10` | Upload size limit |
-| `PRAMAAN_OCR_LANGUAGES` | `eng+hin` | Tesseract languages |
+| `PRAMAAN_OCR_LANGUAGES` | `eng+hin` | Tesseract languages (any that are not installed are skipped with a warning) |
+| `PRAMAAN_TESSERACT_CMD` | auto | Path to `tesseract`/`tesseract.exe` if it is not on PATH |
 | `PRAMAAN_CURRENT_CYCLE` | `2026-27` | Approval cycle whose rulebook is used |
 | `PRAMAAN_CORS_ORIGINS` | Vite dev origins | Comma-separated |
 

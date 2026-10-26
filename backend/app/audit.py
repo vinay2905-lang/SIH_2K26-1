@@ -33,7 +33,7 @@ def _process_lock():
         yield
         return
     path = get_settings().data_dir / "audit.lock"
-    with open(path, "a+") as fh:
+    with open(path, "a+", encoding="utf-8") as fh:
         fcntl.flock(fh, fcntl.LOCK_EX)
         try:
             yield

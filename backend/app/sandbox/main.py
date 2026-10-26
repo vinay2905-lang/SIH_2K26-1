@@ -23,7 +23,7 @@ def registry_path() -> Path:
 @lru_cache(maxsize=1)
 def _load(mtime: float) -> dict:
     path = registry_path()
-    return json.loads(path.read_text()) if path.exists() else {}
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
 
 
 def registry() -> dict:

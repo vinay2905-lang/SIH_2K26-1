@@ -39,6 +39,8 @@ class Settings(BaseSettings):
     # Uploads
     max_upload_mb: int = 10
     ocr_languages: str = "eng+hin"
+    # Path to tesseract(.exe) when it is not on PATH. On Windows the default install folder is found automatically.
+    tesseract_cmd: str = ""
 
     # Rule/process defaults
     current_cycle: str = "2026-27"

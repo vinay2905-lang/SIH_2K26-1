@@ -1,8 +1,10 @@
 """Read a PDF or image into positioned words and visual lines (text layer first, Tesseract OCR as fallback)."""
 import io
 import logging
+import os
 from collections import Counter
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import fitz  # PyMuPDF
 from PIL import Image, ImageOps
@@ -69,27 +71,45 @@ def sniff_kind(data: bytes) -> str | None:
 
 
 _tesseract_ok: bool | None = None
+_ocr_lang = "eng"
+
+
+def _tesseract_cmd() -> str:
+    cmd = get_settings().tesseract_cmd
+    if not cmd and os.name == "nt":
+        default = Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "Tesseract-OCR" / "tesseract.exe"
+        cmd = str(default) if default.exists() else ""
+    return cmd
 
 
 def ocr_available() -> bool:
-    global _tesseract_ok
+    global _tesseract_ok, _ocr_lang
     if _tesseract_ok is None:
         try:
             import pytesseract
 
+            if cmd := _tesseract_cmd():
+                pytesseract.pytesseract.tesseract_cmd = cmd
             pytesseract.get_tesseract_version()
-            _tesseract_ok = True
-        except Exception:
+            installed = set(pytesseract.get_languages(config=""))
+            wanted = [lang for lang in get_settings().ocr_languages.split("+") if lang]
+            usable = [lang for lang in wanted if lang in installed]
+            if not usable:
+                raise RuntimeError(f"none of the OCR languages {wanted} is installed")
+            if len(usable) < len(wanted):
+                log.warning("Tesseract language data missing for %s; using %s",
+                            ", ".join(sorted(set(wanted) - set(usable))), "+".join(usable))
+            _ocr_lang, _tesseract_ok = "+".join(usable), True
+        except Exception as e:
             _tesseract_ok = False
-            log.warning("Tesseract not found: scanned documents will be routed to manual review")
+            log.warning("Tesseract not available (%s): scanned documents will be routed to manual review", e)
     return _tesseract_ok
 
 
 def ocr_image(img: Image.Image, page: int, scale: float) -> list[Word]:
     import pytesseract
 
-    data = pytesseract.image_to_data(img.convert("L"), lang=get_settings().ocr_languages,
-                                     output_type=pytesseract.Output.DICT)
+    data = pytesseract.image_to_data(img.convert("L"), lang=_ocr_lang, output_type=pytesseract.Output.DICT)
     words = []
     for i, txt in enumerate(data["text"]):
         txt = (txt or "").strip()

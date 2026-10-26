@@ -233,7 +233,7 @@ def main():
             (sample_dir / slot).mkdir(parents=True, exist_ok=True)
             (sample_dir / slot / name).write_bytes(data)
     (s.data_dir / "sandbox").mkdir(parents=True, exist_ok=True)
-    (s.data_dir / "sandbox" / "registry.json").write_text(json.dumps(registry, indent=1))
+    (s.data_dir / "sandbox" / "registry.json").write_text(json.dumps(registry, indent=1), encoding="utf-8")
 
     for inst in INSTITUTIONS:
         docs, reg, faculty, extra, idx = built[inst["id"]]

@@ -71,7 +71,7 @@ def init_db() -> None:
             conn.execute(text("SELECT pg_advisory_xact_lock(424243)"))
             Base.metadata.create_all(conn)
         return
-    with open(get_settings().data_dir / "init.lock", "a") as fh:
+    with open(get_settings().data_dir / "init.lock", "a", encoding="utf-8") as fh:
         if fcntl:
             fcntl.flock(fh, fcntl.LOCK_EX)
         Base.metadata.create_all(engine)

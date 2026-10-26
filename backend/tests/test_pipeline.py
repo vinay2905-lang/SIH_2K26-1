@@ -82,6 +82,8 @@ def test_every_sample_document_is_classified_correctly(seeded):
     for slot_dir in root.glob("*/*"):
         for f in slot_dir.iterdir():
             ing = ingest.ingest(f.read_bytes())
+            if ing.text_source == "NONE" and not ingest.ocr_available():
+                continue  # a scan without Tesseract goes to manual review instead (covered above)
             detected, _, _ = classify.classify(ing)
             assert detected == slot_dir.name, f"{f} read as {detected}"
             checked += 1
