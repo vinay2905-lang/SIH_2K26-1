@@ -15,7 +15,7 @@ The simplest reliable host is **one Linux virtual machine (VM)** running Docker.
 | Ports **22, 80, 443** open | SSH, and HTTP/HTTPS for the certificate and the site |
 | A hostname pointing at the VM | Required for HTTPS. Azure gives you one for free (step 3). |
 
-> Free "web app" tiers such as Render's free plan are too small for this app: 0.1 CPU, 512 MB, and no disk that survives a restart. Reading the demo documents alone would take many minutes. Vercel can host the frontend only; see **Option C**.
+> **Just need a free demo link?** See **Option D: Render**. A single container runs PRAMAAN on Render's free plan. It is slower, and every restart resets it to the demo data. Vercel can host the frontend only; see **Option C**.
 
 ## Option A: Azure for Students (free credit, no credit card)
 
@@ -133,9 +133,42 @@ Notes:
 - **Keep both sides in step.** Vercel redeploys the frontend on every push, but the server only updates when you run `git pull && sudo docker compose up -d --build` there. After a change that touches both frontend and backend, update the server too.
 - **The server's own address keeps working**, with the same data. Vercel just gives you a second address.
 
+## Option D: Render (one container, free plan)
+
+The root `Dockerfile` packs everything into one container:
+- the web app, the API and its background jobs;
+- SQLite for the database;
+- the demo data, loaded while the image is built.
+
+Tested with Render's free-plan limits (512 MB RAM, 0.1 CPU), the full walkthrough of every role passed. Memory peaked around 300 MB, plus about 140 MB while reading a scanned page.
+
+1. On https://render.com, choose **New → Web Service** and connect the GitHub repo `vinay2905-lang/SIH_2K26-1`.
+2. Fill in the form:
+
+   | Field | Value |
+   |---|---|
+   | Language | **Docker** |
+   | Branch | `claude/stoic-mayer-utvdia` |
+   | Region | **Singapore** (closest to India) |
+   | Root Directory | leave empty |
+   | Dockerfile Path | `./Dockerfile` (the default) |
+   | Docker Build Context Directory | `.` (the default) |
+   | Docker Command | leave empty |
+   | Instance Type | **Free**, or Starter for a faster, always-on service |
+   | Health Check Path (under Advanced) | `/api/health` |
+
+   No environment variables are needed. **Don't set `PRAMAAN_STORAGE_KEY`**: the demo documents in the image are encrypted with the built-in key.
+3. Click **Deploy Web Service**. The first build takes about 10–15 minutes. Then open the `https://<name>.onrender.com` link.
+
+What to expect on the free plan:
+- **It sleeps after 15 minutes without visitors.** The next visit takes about a minute to wake it. Open the link a few minutes before a demo.
+- **Every restart or redeploy resets to the demo data.** Uploads, decisions and rule changes are lost. That is handy for demos. For data that stays, use Option A or B.
+- **Reading documents is slower.** A scanned page takes about 15–20 seconds instead of 2.
+- **Everyone has to sign in again** after a restart.
+
 ## Day-to-day commands
 
-Run these on the server, inside the `pramaan` folder.
+Run these on the server (Options A and B), inside the `pramaan` folder.
 
 | Task | Command |
 |---|---|

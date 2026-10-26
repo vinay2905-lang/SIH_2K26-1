@@ -1,0 +1,11 @@
+# Build context of the root (single-container) Dockerfile
+.git
+**/node_modules
+**/__pycache__
+**/.venv
+**/.pytest_cache
+frontend/dist
+*.tsbuildinfo
+backend/data
+e2e
+.env

@@ -113,6 +113,8 @@ git clone -b claude/stoic-mayer-utvdia https://github.com/vinay2905-lang/SIH_2K2
 sudo bash deploy/setup.sh --domain <your-hostname> --demo
 ```
 
+For a quick free demo link, the root `Dockerfile` runs everything in one container on Render's free plan. The demo resets on every restart; see *Option D* in the deploy guide.
+
 The React frontend can also be hosted on Vercel. Set the root directory to `frontend` and set `VITE_API_BASE` to the server's `https://` address. The backend still runs on the server: it needs Tesseract, persistent storage and a background worker, which Vercel functions don't provide. See *Option C* in the deploy guide.
 
 ## Production deployment (Docker)
@@ -192,7 +194,8 @@ backend/
   tests/
 frontend/           React + TypeScript (Vite)
 e2e/                Playwright walkthrough
-deploy/             setup.sh (server install), reset-demo.sh, Caddyfile (HTTPS)
+Dockerfile          single-container image (Render and similar hosts)
+deploy/             setup.sh (server install), reset-demo.sh, Caddyfile (HTTPS), start-single.sh
 docs/               ARCHITECTURE.md, DEPLOY.md
 docker-compose.yml
 ```
