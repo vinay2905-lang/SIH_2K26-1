@@ -15,7 +15,7 @@ The simplest reliable host is **one Linux virtual machine (VM)** running Docker.
 | Ports **22, 80, 443** open | SSH, and HTTP/HTTPS for the certificate and the site |
 | A hostname pointing at the VM | Required for HTTPS. Azure gives you one for free (step 3). |
 
-> Free "web app" tiers such as Render's free plan are too small for this app: 0.1 CPU, 512 MB, and no disk that survives a restart. Reading the demo documents alone would take many minutes.
+> Free "web app" tiers such as Render's free plan are too small for this app: 0.1 CPU, 512 MB, and no disk that survives a restart. Reading the demo documents alone would take many minutes. Vercel can host the frontend only; see **Option C**.
 
 ## Option A: Azure for Students (free credit, no credit card)
 
@@ -102,6 +102,36 @@ sudo bash deploy/setup.sh --domain 20-40-60-80.sslip.io --demo
 ```
 
 Without `--domain`, the site runs on plain HTTP at `http://<server-ip>:8080`. Then open port 8080 in the firewall, not 80/443. Browsers will show it as "Not secure".
+
+## Option C: frontend on Vercel, backend on your server
+
+Vercel can host the React frontend (a free `*.vercel.app` link, redeployed on every `git push`). It can't host the backend: PRAMAAN needs the following, and Vercel's serverless functions offer none of them:
+- Tesseract installed on the machine;
+- a disk that keeps the encrypted documents;
+- a background worker that is always running.
+
+So this option is **in addition to** Option A or B. The frontend on Vercel calls the API on your server directly.
+
+1. **Set up the server first** (Option A or B) **with `--domain`.** The API must be on HTTPS: a page served from `https://…vercel.app` is not allowed to call an `http://` address.
+2. **Import the project into Vercel.**
+   1. Go to https://vercel.com → **Add New… → Project**.
+   2. Sign in with GitHub and import `vinay2905-lang/SIH_2K26-1`.
+   3. Set **Root Directory** to `frontend`. The Vite framework preset is detected automatically.
+   4. Under **Environment Variables**, add `VITE_API_BASE` = `https://pramaan-sih.centralindia.cloudapp.azure.com` (your server's address, no trailing slash).
+   5. Click **Deploy**. If `VITE_API_BASE` is missing or not `https://`, the build stops with a message saying so.
+3. **Allow the Vercel site on the server.** Run this on the server, using your Vercel link:
+
+   ```bash
+   sudo bash deploy/setup.sh --domain pramaan-sih.centralindia.cloudapp.azure.com --frontend https://sih-2k26-1.vercel.app
+   ```
+
+   Re-running the script is safe: data and secrets are kept.
+4. Open your `*.vercel.app` link and sign in.
+
+Notes:
+- **Preview deployments.** Each Vercel preview deployment gets its own URL. To let previews call the API too, add a pattern to `.env` on the server and run `sudo docker compose up -d`. For example: `PRAMAAN_CORS_ORIGIN_REGEX=https://sih-2k26-1-[a-z0-9-]+\.vercel\.app`
+- **Keep both sides in step.** Vercel redeploys the frontend on every push, but the server only updates when you run `git pull && sudo docker compose up -d --build` there. After a change that touches both frontend and backend, update the server too.
+- **The server's own address keeps working**, with the same data. Vercel just gives you a second address.
 
 ## Day-to-day commands
 

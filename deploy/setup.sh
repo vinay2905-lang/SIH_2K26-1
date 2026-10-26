@@ -7,19 +7,22 @@
 #                   and HOST must point at this server). Without it the site is plain http://SERVER-IP:8080
 #   --demo          load the synthetic demo data (only into an empty database) and list the demo
 #                   accounts on the sign-in page
+#   --frontend URL  also allow a separately hosted frontend, e.g. https://pramaan-sih.vercel.app
 #
 # Safe to run again: secrets in .env are kept, and existing data is never wiped.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-usage() { sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; }
 
 DOMAIN=""
 DEMO=false
+FRONTEND=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --domain) DOMAIN="${2:?--domain needs a hostname}"; shift 2 ;;
     --demo) DEMO=true; shift ;;
+    --frontend) FRONTEND="${2:?--frontend needs a URL}"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown option: $1" >&2; usage >&2; exit 1 ;;
   esac
@@ -62,7 +65,9 @@ if [ -n "$DOMAIN" ]; then
   set_env PRAMAAN_DOMAIN "$DOMAIN"
   set_env COMPOSE_PROFILES https
   set_env PRAMAAN_HTTP_PORT 127.0.0.1:8080   # only Caddy is reachable from outside
-  set_env PRAMAAN_CORS_ORIGINS "https://$DOMAIN"
+fi
+if [ -n "$FRONTEND" ]; then
+  set_env PRAMAAN_CORS_ORIGINS "${FRONTEND%/}"
 fi
 if [ "$(get_env COMPOSE_PROFILES)" = "https" ] && [ -n "$(get_env PRAMAAN_DOMAIN)" ]; then
   URL="https://$(get_env PRAMAAN_DOMAIN)"

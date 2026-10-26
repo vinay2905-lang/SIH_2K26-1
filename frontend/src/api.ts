@@ -1,6 +1,8 @@
 // Thin client for the PRAMAAN API. The session token lives in localStorage (per-browser convenience only).
 
 const TOKEN_KEY = "pramaan.token";
+// Empty when the API is served from the same origin; set at build time when the frontend is hosted elsewhere.
+const API_BASE = (import.meta.env.VITE_API_BASE || "").replace(/\/+$/, "");
 
 export function getToken(): string | null {
   try {
@@ -68,13 +70,13 @@ export async function api<T>(path: string, opts: { method?: string; body?: unkno
   } else {
     init.headers = headers();
   }
-  const res = await fetch(path, init);
+  const res = await fetch(API_BASE + path, init);
   if (!res.ok) await fail(res);
   return (await res.json()) as T;
 }
 
 export async function apiBlob(path: string): Promise<Blob> {
-  const res = await fetch(path, { headers: headers() });
+  const res = await fetch(API_BASE + path, { headers: headers() });
   if (!res.ok) await fail(res);
   return res.blob();
 }

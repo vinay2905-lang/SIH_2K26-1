@@ -48,6 +48,8 @@ class Settings(BaseSettings):
     # Rule/process defaults
     current_cycle: str = "2026-27"
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+    # Extra allowed origins as a regular expression, e.g. Vercel preview URLs: https://pramaan-[a-z0-9-]+\.vercel\.app
+    cors_origin_regex: str = ""
 
 
     def check_production(self) -> None:

@@ -38,6 +38,7 @@ async def lifespan(_: FastAPI):
 app = FastAPI(title="PRAMAAN API", version="1.0.0", lifespan=lifespan,
               description="Evidence-linked AI pre-scrutiny for AICTE approval applications. Decision support only.")
 app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in get_settings().cors_origins.split(",") if o.strip()],
+                   allow_origin_regex=get_settings().cors_origin_regex or None,
                    allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 

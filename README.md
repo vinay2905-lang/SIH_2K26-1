@@ -113,6 +113,8 @@ git clone -b claude/stoic-mayer-utvdia https://github.com/vinay2905-lang/SIH_2K2
 sudo bash deploy/setup.sh --domain <your-hostname> --demo
 ```
 
+The React frontend can also be hosted on Vercel. Set the root directory to `frontend` and set `VITE_API_BASE` to the server's `https://` address. The backend still runs on the server: it needs Tesseract, persistent storage and a background worker, which Vercel functions don't provide. See *Option C* in the deploy guide.
+
 ## Production deployment (Docker)
 
 `docker-compose.yml` runs PostgreSQL, the API (2 processes), a separate background worker, and nginx serving the React build. With `COMPOSE_PROFILES=https` and `PRAMAAN_DOMAIN` set, it also runs Caddy, which serves the site over HTTPS with an automatic certificate. `deploy/setup.sh` writes all of this for you.
@@ -145,7 +147,8 @@ All settings are environment variables with the prefix `PRAMAAN_` (see `backend/
 | `PRAMAAN_OCR_LANGUAGES` | `eng+hin` | Tesseract languages (any that are not installed are skipped with a warning) |
 | `PRAMAAN_TESSERACT_CMD` | auto | Path to `tesseract`/`tesseract.exe` if it is not on PATH |
 | `PRAMAAN_CURRENT_CYCLE` | `2026-27` | Approval cycle whose rulebook is used |
-| `PRAMAAN_CORS_ORIGINS` | Vite dev origins | Comma-separated |
+| `PRAMAAN_CORS_ORIGINS` | Vite dev origins | Comma-separated origins allowed to call the API from another site (e.g. a Vercel frontend) |
+| `PRAMAAN_CORS_ORIGIN_REGEX` | none | Same, as a regular expression (e.g. Vercel preview URLs) |
 | `PRAMAAN_SHOW_DEMO_LOGINS` | `true` (`false` in docker-compose) | List the demo accounts on the sign-in page |
 
 ## Tests
